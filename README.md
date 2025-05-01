@@ -16,5 +16,5 @@ You can interact with agent just like whatsapp messages and get you inventory ma
 
 
 SAMPLE :
-![image](https://github.com/user-attachments/assets/86ce8e5e-08e8-44ac-bef2-ed1fabe00f5b)
+![image](https://github.com/user-attachments/assets/946e7d44-241d-494b-b7d2-bae60fff75ba)
 
