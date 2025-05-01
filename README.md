@@ -12,6 +12,9 @@ Dynamic Updates: Record purchases and sales by simply telling the agent — it w
 Real-Time Status Checks: Get live information on current stock levels for any item.
 
 
+You can interact with agent just like whatsapp messages and get you inventory managed by it.
+
+
 SAMPLE :
 ![image](https://github.com/user-attachments/assets/86ce8e5e-08e8-44ac-bef2-ed1fabe00f5b)
 
