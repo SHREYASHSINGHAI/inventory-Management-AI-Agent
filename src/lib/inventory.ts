@@ -5,6 +5,7 @@ export interface InventoryItem {
   name: string;
   quantity: number;
   unit: string;
+  threshold?: number;
   lastUpdated: string;
 }
 
@@ -69,6 +70,38 @@ export async function updateStock(
       name: itemName,
       quantity: quantityChange > 0 ? quantityChange : 0,
       unit: unit || 'units',
+      lastUpdated: new Date().toISOString(),
+    };
+    const docRef = await db.collection(COLLECTION).add(newItem);
+    return { id: docRef.id, ...newItem };
+  }
+}
+
+export async function setThreshold(itemName: string, threshold: number): Promise<InventoryItem> {
+  const allSnapshot = await db.collection(COLLECTION).get();
+  const existingDoc = allSnapshot.docs.find(
+    (doc) => (doc.data().name as string).toLowerCase() === itemName.toLowerCase()
+  );
+
+  if (existingDoc) {
+    const currentData = existingDoc.data();
+    const updatedData = {
+      threshold,
+      lastUpdated: new Date().toISOString(),
+    };
+    await db.collection(COLLECTION).doc(existingDoc.id).update(updatedData);
+    return {
+      id: existingDoc.id,
+      ...currentData,
+      ...updatedData,
+    } as InventoryItem;
+  } else {
+    // Create new item with 0 quantity if it doesn't exist
+    const newItem = {
+      name: itemName,
+      quantity: 0,
+      unit: 'units',
+      threshold,
       lastUpdated: new Date().toISOString(),
     };
     const docRef = await db.collection(COLLECTION).add(newItem);

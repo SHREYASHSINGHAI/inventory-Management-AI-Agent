@@ -3,7 +3,7 @@ import { streamText, stepCountIs } from 'ai';
 import { createUIMessageStreamResponse, toUIMessageStream, convertToModelMessages } from 'ai';
 import { tool } from '@ai-sdk/provider-utils';
 import { z } from 'zod';
-import { getInventory, checkStock, updateStock } from '@/lib/inventory';
+import { getInventory, checkStock, updateStock, setThreshold } from '@/lib/inventory';
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -24,6 +24,7 @@ export async function POST(req: Request) {
       system: 'You are an inventory management AI assistant. You help users manage their inventory smoothly via chat. ' +
         'Be concise, professional, and helpful. When a user asks about stock, use the check_stock tool or list_inventory tool. ' +
         'When a user wants to add, remove, or record sales/purchases, use the update_stock tool. ' +
+        'When a user wants to set a low stock threshold or alert level for an item, use the set_threshold tool. ' +
         'Always confirm with the user what actions you have taken. Make the interface feel robust and reliable.',
       messages: modelMessages,
       stopWhen: stepCountIs(5),
@@ -61,6 +62,21 @@ export async function POST(req: Request) {
             return JSON.stringify({
               success: true,
               message: `Stock updated for ${itemName}. New quantity is ${item.quantity} ${item.unit}.`,
+              item,
+            });
+          },
+        }),
+        set_threshold: tool({
+          description: 'Set a low stock threshold for a specific item to alert the user when stock falls below this amount.',
+          inputSchema: z.object({
+            itemName: z.string().describe('The name of the item to set the threshold for'),
+            threshold: z.number().describe('The minimum quantity threshold'),
+          }),
+          execute: async ({ itemName, threshold }) => {
+            const item = await setThreshold(itemName, threshold);
+            return JSON.stringify({
+              success: true,
+              message: `Threshold for ${itemName} set to ${threshold}.`,
               item,
             });
           },
